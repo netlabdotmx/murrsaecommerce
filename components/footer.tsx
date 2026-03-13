@@ -12,11 +12,6 @@ export function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <div className="bg-murrsa-red p-2 rounded-sm">
-                <span className="font-[var(--font-display)] text-white text-xl leading-none">
-                  M
-                </span>
-              </div>
               <div>
                 <h2 className="font-[var(--font-display)] text-white text-2xl tracking-widest leading-none">
                   MURRSA

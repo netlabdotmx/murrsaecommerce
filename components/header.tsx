@@ -28,12 +28,7 @@ export function Header() {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="bg-murrsa-red p-2 rounded-sm group-hover:bg-murrsa-red-light transition-colors">
-              <span className="font-[var(--font-display)] text-white text-2xl md:text-3xl tracking-wider leading-none">
-                M
-              </span>
-            </div>
-            <div className="hidden sm:block">
+            <div>
               <h1 className="font-[var(--font-display)] text-white text-2xl md:text-3xl tracking-widest leading-none">
                 MURRSA
               </h1>
