@@ -1,0 +1,166 @@
+@import "tailwindcss";
+
+/* ============================================
+   MURRSA — American Corporate Modernism Design System
+   Retro 1970s–80s Industrial Identity
+   Colors: Red & Blue on Cream
+   ============================================ */
+
+@theme inline {
+  /* Brand Colors */
+  --color-murrsa-red: #C41E3A;
+  --color-murrsa-red-dark: #9B1830;
+  --color-murrsa-red-light: #E8405A;
+  --color-murrsa-blue: #1B3A5C;
+  --color-murrsa-blue-dark: #0F2640;
+  --color-murrsa-blue-light: #2A5580;
+  --color-murrsa-cream: #F5F0E8;
+  --color-murrsa-cream-dark: #E8E0D0;
+  --color-murrsa-charcoal: #2D2D2D;
+  --color-murrsa-gold: #D4A843;
+  --color-murrsa-gold-dark: #B8922F;
+  --color-murrsa-steel: #6B7280;
+  --color-murrsa-steel-light: #9CA3AF;
+  --color-murrsa-white: #FEFCF9;
+
+  /* Font families */
+  --font-display: var(--font-bebas-neue), "Impact", "Haettenschweiler", sans-serif;
+  --font-body: var(--font-ibm-plex-sans), "Helvetica Neue", "Arial", sans-serif;
+}
+
+/* ---- Base Styles ---- */
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background-color: var(--color-murrsa-cream);
+    color: var(--color-murrsa-charcoal);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: var(--color-murrsa-red);
+    color: white;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1.1;
+  }
+}
+
+/* ---- Custom Utilities ---- */
+
+@layer utilities {
+  /* Retro halftone dot texture overlay */
+  .retro-dots {
+    background-image: radial-gradient(circle, var(--color-murrsa-charcoal) 0.5px, transparent 0.5px);
+    background-size: 12px 12px;
+    opacity: 0.04;
+  }
+
+  /* Starburst badge */
+  .starburst {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-murrsa-gold);
+    color: var(--color-murrsa-charcoal);
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.75rem;
+    clip-path: polygon(
+      50% 0%, 61% 11%, 75% 3%, 72% 19%, 88% 19%,
+      79% 32%, 95% 40%, 82% 48%, 95% 60%, 79% 62%,
+      88% 78%, 72% 73%, 75% 90%, 61% 80%, 50% 95%,
+      39% 80%, 25% 90%, 28% 73%, 12% 78%, 21% 62%,
+      5% 60%, 18% 48%, 5% 40%, 21% 32%, 12% 19%,
+      28% 19%, 25% 3%, 39% 11%
+    );
+    min-width: 60px;
+    min-height: 60px;
+  }
+
+  /* Thick industrial border */
+  .border-industrial {
+    border: 3px solid var(--color-murrsa-charcoal);
+  }
+
+  /* Striped banner pattern */
+  .stripe-pattern {
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 4px,
+      var(--color-murrsa-red) 4px,
+      var(--color-murrsa-red) 5px
+    );
+    opacity: 0.08;
+  }
+}
+
+/* ---- Custom scrollbar ---- */
+
+::-webkit-scrollbar {
+  width: 10px;
+  background: var(--color-murrsa-cream-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-murrsa-steel);
+  border-radius: 0;
+  border: 2px solid var(--color-murrsa-cream-dark);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-murrsa-blue);
+}
+
+/* ---- Focus & Accessibility ---- */
+
+.skip-to-content {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  z-index: 9999;
+  padding: 12px 24px;
+  background: var(--color-murrsa-red);
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  transition: top 0.2s ease;
+}
+.skip-to-content:focus {
+  top: 0;
+  outline: 2px solid var(--color-murrsa-blue);
+  outline-offset: 2px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-murrsa-red);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
