@@ -31,12 +31,24 @@ export function CatalogoContent() {
       if (search) params.set("search", search);
 
       const res = await fetch(`/api/products?${params.toString()}`);
-      const data: ProductsResponse = await res.json();
+      const data = await res.json();
+
+      if (!res.ok || !data.products) {
+        console.error("API error:", data.error || "Unexpected response");
+        setProducts([]);
+        setTotal(0);
+        setTotalPages(0);
+        return;
+      }
+
       setProducts(data.products);
       setTotal(data.total);
       setTotalPages(data.totalPages);
     } catch (err) {
       console.error("Error loading products:", err);
+      setProducts([]);
+      setTotal(0);
+      setTotalPages(0);
     } finally {
       setLoading(false);
     }
