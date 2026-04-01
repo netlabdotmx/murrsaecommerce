@@ -203,6 +203,51 @@ export async function getLocations(sessionId: string, warehouseId?: number) {
   }));
 }
 
+// --- Search Locations (multi-field) ---
+
+export async function searchLocations(sessionId: string, query: string, limit = 30) {
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+
+  const words = trimmed.split(/\s+/).filter(Boolean);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const domain: any[] = [["active", "=", true]];
+
+  for (const word of words) {
+    // Each word must match at least one location field
+    domain.push("|", "|", "|", "|");
+    domain.push(["full_location", "ilike", word]);
+    domain.push(["pasillo", "ilike", word]);
+    domain.push(["anaquel", "ilike", word]);
+    domain.push(["charola", "ilike", word]);
+    domain.push(["caja", "ilike", word]);
+  }
+
+  const locations = await callKw(
+    sessionId,
+    "murr.location",
+    "search_read",
+    [domain],
+    {
+      fields: ["id", "full_location", "warehouse_id", "pasillo", "anaquel", "charola", "caja"],
+      order: "warehouse_id, pasillo, anaquel, charola, caja",
+      limit,
+    }
+  );
+
+  return (locations as Record<string, unknown>[]).map((l) => ({
+    id: l.id as number,
+    fullLocation: l.full_location as string,
+    warehouseId: (l.warehouse_id as [number, string])[0],
+    warehouseName: (l.warehouse_id as [number, string])[1],
+    pasillo: (l.pasillo as string) || "",
+    anaquel: (l.anaquel as string) || "",
+    charola: (l.charola as string) || "",
+    caja: (l.caja as string) || "",
+  }));
+}
+
 // --- Stock Moves ---
 
 export async function createAndConfirmMove(

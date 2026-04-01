@@ -38,6 +38,12 @@ export default function CapturaPage() {
   const [selectedWarehouse, setSelectedWarehouse] = useState<number | null>(null);
   const [loadingLocations, setLoadingLocations] = useState(false);
 
+  // Location search
+  const [locationQuery, setLocationQuery] = useState("");
+  const [locationSearchResults, setLocationSearchResults] = useState<Location[]>([]);
+  const [searchingLocations, setSearchingLocations] = useState(false);
+  const locationSearchTimeout = useRef<NodeJS.Timeout | null>(null);
+
   // Save
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -122,6 +128,8 @@ export default function CapturaPage() {
   // --- Add Location ---
   async function openLocationPicker() {
     setShowLocationPicker(true);
+    setLocationQuery("");
+    setLocationSearchResults([]);
     setLoadingLocations(true);
     try {
       const res = await fetch("/api/inventory/locations");
@@ -131,6 +139,29 @@ export default function CapturaPage() {
       }
     } catch { /* ignore */ }
     setLoadingLocations(false);
+  }
+
+  // --- Location Search ---
+  const doLocationSearch = useCallback(async (q: string) => {
+    if (!q.trim()) {
+      setLocationSearchResults([]);
+      return;
+    }
+    setSearchingLocations(true);
+    try {
+      const res = await fetch(`/api/inventory/locations?q=${encodeURIComponent(q)}`);
+      if (res.ok) {
+        const data = await res.json();
+        setLocationSearchResults(data.locations || []);
+      }
+    } catch { /* ignore */ }
+    setSearchingLocations(false);
+  }, []);
+
+  function handleLocationQueryChange(value: string) {
+    setLocationQuery(value);
+    if (locationSearchTimeout.current) clearTimeout(locationSearchTimeout.current);
+    locationSearchTimeout.current = setTimeout(() => doLocationSearch(value), 300);
   }
 
   async function selectWarehouse(whId: number) {
@@ -431,11 +462,10 @@ export default function CapturaPage() {
                           <div className="col-span-2 text-center">
                             {diff !== 0 && (
                               <span
-                                className={`inline-block text-xs font-bold px-2 py-1 ${
-                                  diff > 0
+                                className={`inline-block text-xs font-bold px-2 py-1 ${diff > 0
                                     ? "bg-green-100 text-green-700"
                                     : "bg-red-100 text-red-700"
-                                }`}
+                                  }`}
                               >
                                 {diff > 0 ? `+${diff}` : diff}
                               </span>
@@ -550,7 +580,7 @@ export default function CapturaPage() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center"
-            onClick={() => { setShowLocationPicker(false); setSelectedWarehouse(null); setLocations([]); }}
+            onClick={() => { setShowLocationPicker(false); setSelectedWarehouse(null); setLocations([]); setLocationQuery(""); setLocationSearchResults([]); }}
           >
             <motion.div
               initial={{ y: 100 }}
@@ -561,64 +591,151 @@ export default function CapturaPage() {
             >
               <div className="bg-murrsa-blue px-4 py-3 flex items-center justify-between shrink-0">
                 <h3 className="font-[var(--font-display)] text-white text-lg tracking-wider">
-                  {selectedWarehouse ? "SELECCIONAR UBICACIÓN" : "SELECCIONAR ALMACÉN"}
+                  {locationQuery.trim() ? "BUSCAR UBICACIÓN" : selectedWarehouse ? "SELECCIONAR UBICACIÓN" : "SELECCIONAR ALMACÉN"}
                 </h3>
-                <button onClick={() => { setShowLocationPicker(false); setSelectedWarehouse(null); setLocations([]); }} className="text-white/60 hover:text-white">
+                <button onClick={() => { setShowLocationPicker(false); setSelectedWarehouse(null); setLocations([]); setLocationQuery(""); setLocationSearchResults([]); }} className="text-white/60 hover:text-white">
                   <X size={20} />
                 </button>
               </div>
 
+              {/* Search Bar */}
+              <div className="px-3 py-3 border-b border-murrsa-charcoal/10 shrink-0">
+                <div className="relative">
+                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-murrsa-steel" />
+                  <input
+                    type="text"
+                    value={locationQuery}
+                    onChange={(e) => handleLocationQueryChange(e.target.value)}
+                    placeholder="Buscar por pasillo, anaquel, charola, caja..."
+                    className="w-full pl-9 pr-4 py-3 text-sm border-2 border-murrsa-charcoal/15 bg-murrsa-cream focus:border-murrsa-red outline-none transition-colors"
+                    autoFocus
+                  />
+                  {searchingLocations && (
+                    <Loader2 size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-murrsa-steel animate-spin" />
+                  )}
+                </div>
+              </div>
+
               <div className="overflow-y-auto flex-1 p-2">
-                {loadingLocations ? (
-                  <div className="flex items-center justify-center py-8">
-                    <Loader2 size={24} className="text-murrsa-steel animate-spin" />
-                  </div>
-                ) : !selectedWarehouse ? (
-                  <div className="space-y-1">
-                    {warehouses.map((w) => (
-                      <button
-                        key={w.id}
-                        onClick={() => selectWarehouse(w.id)}
-                        className="w-full text-left px-4 py-3 hover:bg-murrsa-cream transition-colors flex items-center justify-between border-b border-murrsa-charcoal/10"
-                      >
-                        <div>
-                          <span className="text-sm font-semibold text-murrsa-charcoal">{w.name}</span>
-                          <span className="text-xs text-murrsa-steel ml-2">({w.code})</span>
-                        </div>
-                        <ChevronDown size={16} className="text-murrsa-steel -rotate-90" />
-                      </button>
-                    ))}
-                  </div>
+                {/* === SEARCH RESULTS MODE === */}
+                {locationQuery.trim() ? (
+                  searchingLocations ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 size={24} className="text-murrsa-steel animate-spin" />
+                    </div>
+                  ) : locationSearchResults.length > 0 ? (
+                    <div className="space-y-1">
+                      {locationSearchResults.map((l) => {
+                        const alreadyAdded = edits.some((e) => e.locationId === l.id);
+                        return (
+                          <button
+                            key={l.id}
+                            onClick={() => !alreadyAdded && addLocation(l)}
+                            disabled={alreadyAdded}
+                            className={`w-full text-left px-4 py-3 transition-colors border-b border-murrsa-charcoal/10 ${alreadyAdded
+                                ? "opacity-40 cursor-not-allowed"
+                                : "hover:bg-murrsa-cream"
+                              }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-semibold text-murrsa-charcoal">
+                                  {l.fullLocation}
+                                </p>
+                                <div className="flex flex-wrap items-center gap-2 mt-1">
+                                  {l.pasillo && (
+                                    <span className="text-[10px] bg-murrsa-blue/10 text-murrsa-blue font-semibold px-1.5 py-0.5 uppercase">
+                                      Pasillo {l.pasillo}
+                                    </span>
+                                  )}
+                                  {l.anaquel && (
+                                    <span className="text-[10px] bg-murrsa-gold/15 text-murrsa-charcoal font-semibold px-1.5 py-0.5">
+                                      Anaquel {l.anaquel}
+                                    </span>
+                                  )}
+                                  {l.charola && (
+                                    <span className="text-[10px] bg-green-100 text-green-700 font-semibold px-1.5 py-0.5">
+                                      Charola {l.charola}
+                                    </span>
+                                  )}
+                                  {l.caja && (
+                                    <span className="text-[10px] bg-purple-100 text-purple-700 font-semibold px-1.5 py-0.5">
+                                      Caja {l.caja}
+                                    </span>
+                                  )}
+                                  <span className="text-[10px] text-murrsa-steel">
+                                    {l.warehouseName}
+                                  </span>
+                                </div>
+                              </div>
+                              {alreadyAdded ? (
+                                <span className="text-[10px] text-murrsa-steel ml-2 shrink-0">(ya agregada)</span>
+                              ) : (
+                                <MapPin size={14} className="text-murrsa-steel/40 shrink-0 ml-2" />
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <MapPin size={32} className="text-murrsa-steel/20 mx-auto mb-2" />
+                      <p className="text-sm text-murrsa-steel">Sin resultados para &ldquo;{locationQuery}&rdquo;</p>
+                    </div>
+                  )
                 ) : (
-                  <div className="space-y-1">
-                    <button
-                      onClick={() => { setSelectedWarehouse(null); setLocations([]); }}
-                      className="w-full text-left px-4 py-2 text-murrsa-red text-sm font-semibold hover:bg-murrsa-cream transition-colors"
-                    >
-                      ← Volver a almacenes
-                    </button>
-                    {locations.map((l) => {
-                      const alreadyAdded = edits.some((e) => e.locationId === l.id);
-                      return (
+                  /* === BROWSE MODE (original flow) === */
+                  loadingLocations ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 size={24} className="text-murrsa-steel animate-spin" />
+                    </div>
+                  ) : !selectedWarehouse ? (
+                    <div className="space-y-1">
+                      {warehouses.map((w) => (
                         <button
-                          key={l.id}
-                          onClick={() => !alreadyAdded && addLocation(l)}
-                          disabled={alreadyAdded}
-                          className={`w-full text-left px-4 py-3 transition-colors border-b border-murrsa-charcoal/10 ${
-                            alreadyAdded
-                              ? "opacity-40 cursor-not-allowed"
-                              : "hover:bg-murrsa-cream"
-                          }`}
+                          key={w.id}
+                          onClick={() => selectWarehouse(w.id)}
+                          className="w-full text-left px-4 py-3 hover:bg-murrsa-cream transition-colors flex items-center justify-between border-b border-murrsa-charcoal/10"
                         >
-                          <span className="text-sm text-murrsa-charcoal">{l.fullLocation}</span>
-                          {alreadyAdded && <span className="text-[10px] text-murrsa-steel ml-2">(ya agregada)</span>}
+                          <div>
+                            <span className="text-sm font-semibold text-murrsa-charcoal">{w.name}</span>
+                            <span className="text-xs text-murrsa-steel ml-2">({w.code})</span>
+                          </div>
+                          <ChevronDown size={16} className="text-murrsa-steel -rotate-90" />
                         </button>
-                      );
-                    })}
-                    {locations.length === 0 && (
-                      <p className="text-center text-sm text-murrsa-steel py-6">Sin ubicaciones en este almacén</p>
-                    )}
-                  </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="space-y-1">
+                      <button
+                        onClick={() => { setSelectedWarehouse(null); setLocations([]); }}
+                        className="w-full text-left px-4 py-2 text-murrsa-red text-sm font-semibold hover:bg-murrsa-cream transition-colors"
+                      >
+                        ← Volver a almacenes
+                      </button>
+                      {locations.map((l) => {
+                        const alreadyAdded = edits.some((e) => e.locationId === l.id);
+                        return (
+                          <button
+                            key={l.id}
+                            onClick={() => !alreadyAdded && addLocation(l)}
+                            disabled={alreadyAdded}
+                            className={`w-full text-left px-4 py-3 transition-colors border-b border-murrsa-charcoal/10 ${alreadyAdded
+                                ? "opacity-40 cursor-not-allowed"
+                                : "hover:bg-murrsa-cream"
+                              }`}
+                          >
+                            <span className="text-sm text-murrsa-charcoal">{l.fullLocation}</span>
+                            {alreadyAdded && <span className="text-[10px] text-murrsa-steel ml-2">(ya agregada)</span>}
+                          </button>
+                        );
+                      })}
+                      {locations.length === 0 && (
+                        <p className="text-center text-sm text-murrsa-steel py-6">Sin ubicaciones en este almacén</p>
+                      )}
+                    </div>
+                  )
                 )}
               </div>
             </motion.div>
@@ -647,10 +764,10 @@ function ScannerModal({ onScan, onClose }: { onScan: (code: string) => void; onC
           { facingMode: "environment" },
           { fps: 10, qrbox: { width: 280, height: 120 } },
           (decodedText) => {
-            if (scanner) scanner.stop().catch(() => {});
+            if (scanner) scanner.stop().catch(() => { });
             onScan(decodedText);
           },
-          () => {} // ignore errors during scanning
+          () => { } // ignore errors during scanning
         );
       } catch {
         // Camera not available - user can enter manually
@@ -660,7 +777,7 @@ function ScannerModal({ onScan, onClose }: { onScan: (code: string) => void; onC
     startScanner();
 
     return () => {
-      if (scanner) scanner.stop().catch(() => {});
+      if (scanner) scanner.stop().catch(() => { });
     };
   }, [onScan]);
 
