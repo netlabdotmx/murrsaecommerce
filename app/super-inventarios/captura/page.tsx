@@ -359,6 +359,115 @@ export default function CapturaPage() {
           )}
         </div>
 
+        {/* === LOCATION SEARCH BAR === */}
+        <div className="relative">
+          <div className="bg-murrsa-white border-2 border-murrsa-charcoal/10">
+            <div className="bg-murrsa-charcoal/5 px-4 py-2 border-b border-murrsa-charcoal/10 flex items-center gap-2">
+              <MapPin size={14} className="text-murrsa-red" />
+              <h3 className="text-xs text-murrsa-steel uppercase tracking-wider font-semibold">
+                Buscar Ubicación
+              </h3>
+            </div>
+            <div className="p-3">
+              <div className="relative">
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-murrsa-steel" />
+                <input
+                  type="text"
+                  value={locationQuery}
+                  onChange={(e) => handleLocationQueryChange(e.target.value)}
+                  placeholder="Pasillo, anaquel, charola, caja, ubicación..."
+                  className="w-full pl-9 pr-4 py-3 text-sm border-2 border-murrsa-charcoal/15 bg-murrsa-cream focus:border-murrsa-red outline-none transition-colors"
+                />
+                {searchingLocations && (
+                  <Loader2 size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-murrsa-steel animate-spin" />
+                )}
+              </div>
+            </div>
+
+            {/* Location Search Results */}
+            <AnimatePresence>
+              {locationQuery.trim() && !searchingLocations && locationSearchResults.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="border-t border-murrsa-charcoal/10 max-h-72 overflow-y-auto"
+                >
+                  {locationSearchResults.map((l) => {
+                    const alreadyAdded = selectedProduct ? edits.some((e) => e.locationId === l.id) : false;
+                    return (
+                      <button
+                        key={l.id}
+                        onClick={() => {
+                          if (!alreadyAdded && selectedProduct) {
+                            addLocation(l);
+                            setLocationQuery("");
+                            setLocationSearchResults([]);
+                          }
+                        }}
+                        disabled={alreadyAdded || !selectedProduct}
+                        className={`w-full text-left px-4 py-3 transition-colors border-b border-murrsa-charcoal/10 last:border-b-0 ${alreadyAdded || !selectedProduct
+                            ? "opacity-50 cursor-not-allowed"
+                            : "hover:bg-murrsa-cream"
+                          }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-semibold text-murrsa-charcoal">
+                              {l.fullLocation}
+                            </p>
+                            <div className="flex flex-wrap items-center gap-2 mt-1">
+                              {l.pasillo && (
+                                <span className="text-[10px] bg-murrsa-blue/10 text-murrsa-blue font-semibold px-1.5 py-0.5 uppercase">
+                                  Pasillo {l.pasillo}
+                                </span>
+                              )}
+                              {l.anaquel && (
+                                <span className="text-[10px] bg-murrsa-gold/15 text-murrsa-charcoal font-semibold px-1.5 py-0.5">
+                                  Anaquel {l.anaquel}
+                                </span>
+                              )}
+                              {l.charola && (
+                                <span className="text-[10px] bg-green-100 text-green-700 font-semibold px-1.5 py-0.5">
+                                  Charola {l.charola}
+                                </span>
+                              )}
+                              {l.caja && (
+                                <span className="text-[10px] bg-purple-100 text-purple-700 font-semibold px-1.5 py-0.5">
+                                  Caja {l.caja}
+                                </span>
+                              )}
+                              <span className="text-[10px] text-murrsa-steel">
+                                {l.warehouseName}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="shrink-0 ml-2">
+                            {alreadyAdded ? (
+                              <span className="text-[10px] text-murrsa-steel">(ya agregada)</span>
+                            ) : !selectedProduct ? (
+                              <span className="text-[10px] text-murrsa-steel">(selecciona producto)</span>
+                            ) : (
+                              <Plus size={14} className="text-murrsa-red" />
+                            )}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* No results */}
+            {locationQuery.trim() && !searchingLocations && locationSearchResults.length === 0 && (
+              <div className="border-t border-murrsa-charcoal/10 px-4 py-4 text-center">
+                <p className="text-sm text-murrsa-steel">Sin ubicaciones para &ldquo;{locationQuery}&rdquo;</p>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* === SELECTED PRODUCT === */}
         <AnimatePresence mode="wait">
           {selectedProduct && (
@@ -463,8 +572,8 @@ export default function CapturaPage() {
                             {diff !== 0 && (
                               <span
                                 className={`inline-block text-xs font-bold px-2 py-1 ${diff > 0
-                                    ? "bg-green-100 text-green-700"
-                                    : "bg-red-100 text-red-700"
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-red-100 text-red-700"
                                   }`}
                               >
                                 {diff > 0 ? `+${diff}` : diff}
@@ -633,8 +742,8 @@ export default function CapturaPage() {
                             onClick={() => !alreadyAdded && addLocation(l)}
                             disabled={alreadyAdded}
                             className={`w-full text-left px-4 py-3 transition-colors border-b border-murrsa-charcoal/10 ${alreadyAdded
-                                ? "opacity-40 cursor-not-allowed"
-                                : "hover:bg-murrsa-cream"
+                              ? "opacity-40 cursor-not-allowed"
+                              : "hover:bg-murrsa-cream"
                               }`}
                           >
                             <div className="flex items-center justify-between">
@@ -722,8 +831,8 @@ export default function CapturaPage() {
                             onClick={() => !alreadyAdded && addLocation(l)}
                             disabled={alreadyAdded}
                             className={`w-full text-left px-4 py-3 transition-colors border-b border-murrsa-charcoal/10 ${alreadyAdded
-                                ? "opacity-40 cursor-not-allowed"
-                                : "hover:bg-murrsa-cream"
+                              ? "opacity-40 cursor-not-allowed"
+                              : "hover:bg-murrsa-cream"
                               }`}
                           >
                             <span className="text-sm text-murrsa-charcoal">{l.fullLocation}</span>
