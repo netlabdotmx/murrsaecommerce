@@ -48,7 +48,7 @@ export default async function HomePage() {
             </h1>
 
             <p className="text-white/80 text-lg md:text-xl max-w-xl mb-8 leading-relaxed">
-              Más de <strong className="text-murrsa-gold">4,000 partes</strong> en inventario.
+              Más de <strong className="text-murrsa-gold">12,000 partes</strong> en inventario.
               Empaques, accesorios, componentes — todo lo que tu motor necesita.
             </p>
 
@@ -82,7 +82,7 @@ export default async function HomePage() {
             {[
               {
                 icon: Package,
-                title: "+4,000",
+                title: "+12,000",
                 subtitle: "Refacciones en catálogo",
               },
               {
@@ -274,7 +274,7 @@ export default async function HomePage() {
               <div className="bg-murrsa-blue p-8 md:p-12">
                 <div className="grid grid-cols-2 gap-6">
                   {[
-                    { number: "4,000+", label: "Partes en catálogo" },
+                    { number: "12,000+", label: "Partes en catálogo" },
                     { number: "25+", label: "Años de experiencia" },
                     { number: "100%", label: "Piezas originales" },
                     { number: "500+", label: "Clientes satisfechos" },

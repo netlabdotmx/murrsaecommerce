@@ -23,7 +23,7 @@ const bebasNeue = Bebas_Neue({
 export const metadata: Metadata = {
   title: "MURRSA — Partes para Motores Diesel",
   description:
-    "El distribuidor más grande de refacciones para motores diesel en México. Más de 4,000 partes disponibles. Solicita tu cotización hoy.",
+    "El distribuidor más grande de refacciones para motores diesel en México. Más de 12,000 partes disponibles. Solicita tu cotización hoy.",
   keywords: [
     "refacciones diesel",
     "partes motor diesel",

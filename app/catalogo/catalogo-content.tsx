@@ -80,7 +80,7 @@ export function CatalogoContent() {
             CATÁLOGO DE PRODUCTOS
           </h1>
           <p className="text-white/60 mt-2">
-            Más de 4,000 refacciones para motores diesel
+            Más de 12,000 refacciones para motores diesel
           </p>
         </div>
       </div>

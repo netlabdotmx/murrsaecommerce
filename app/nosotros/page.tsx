@@ -43,7 +43,7 @@ export default function NosotrosPage() {
                   el catálogo más extenso de refacciones diesel del país.
                 </p>
                 <p>
-                  Hoy, con más de <strong>4,000 partes en inventario</strong>,
+                  Hoy, con más de <strong>12,000 partes en inventario</strong>,
                   somos el referente en la industria. Empaques, accesorios,
                   componentes de motor — si existe, lo tenemos o lo
                   conseguimos.
@@ -104,7 +104,7 @@ export default function NosotrosPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
-              { number: "4,000+", label: "Partes en catálogo" },
+              { number: "12,000+", label: "Partes en catálogo" },
               { number: "25+", label: "Años de experiencia" },
               { number: "500+", label: "Clientes activos" },
               { number: "32", label: "Estados con cobertura" },
@@ -129,7 +129,7 @@ export default function NosotrosPage() {
             ¿LISTO PARA ENCONTRAR TU PIEZA?
           </h2>
           <p className="text-murrsa-charcoal/70 mb-8">
-            Explora nuestro catálogo de más de 4,000 refacciones o contáctanos
+            Explora nuestro catálogo de más de 12,000 refacciones o contáctanos
             para asesoría personalizada.
           </p>
           <div className="flex flex-wrap justify-center gap-4">

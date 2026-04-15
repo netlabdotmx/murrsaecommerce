@@ -56,7 +56,7 @@ export default function ContactoPage() {
                     Teléfono
                   </h3>
                   <p className="text-murrsa-charcoal/70 text-sm mt-1">
-                    +52 (55) 1234-5678
+                    33 3689 1556
                   </p>
                 </div>
               </div>
@@ -84,7 +84,7 @@ export default function ContactoPage() {
                     Dirección
                   </h3>
                   <p className="text-murrsa-charcoal/70 text-sm mt-1">
-                    Ciudad de México, MX
+                    Las Granjas 28, La Capilla, 45690 Las Pintas, Jal.
                   </p>
                 </div>
               </div>

@@ -1,6 +1,6 @@
 # MURRSA — Ecommerce de Refacciones Diesel
 
-El distribuidor más grande de refacciones para motores diesel en México. Más de 4,000 partes disponibles.
+El distribuidor más grande de refacciones para motores diesel en México. Más de 12,000 partes disponibles.
 
 ## Tech Stack
 

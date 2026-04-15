@@ -23,7 +23,7 @@ export function Footer() {
             </div>
             <p className="text-sm text-white/60 leading-relaxed">
               El distribuidor más grande de refacciones para motores diesel en
-              México. Más de 4,000 partes en inventario.
+              México. Más de 12,000 partes en inventario.
             </p>
           </div>
 
@@ -60,7 +60,7 @@ export function Footer() {
             <ul className="space-y-3">
               <li className="flex items-start gap-2 text-sm">
                 <Phone size={16} className="text-murrsa-red mt-0.5 shrink-0" />
-                <span className="text-white/60">+52 (55) 1234-5678</span>
+                <span className="text-white/60">33 3689 1556</span>
               </li>
               <li className="flex items-start gap-2 text-sm">
                 <Mail size={16} className="text-murrsa-red mt-0.5 shrink-0" />
@@ -68,7 +68,7 @@ export function Footer() {
               </li>
               <li className="flex items-start gap-2 text-sm">
                 <MapPin size={16} className="text-murrsa-red mt-0.5 shrink-0" />
-                <span className="text-white/60">Ciudad de México, MX</span>
+                <span className="text-white/60">Las Granjas 28, La Capilla, 45690 Las Pintas, Jal.</span>
               </li>
             </ul>
           </div>
@@ -79,7 +79,7 @@ export function Footer() {
               ¿Necesitas una pieza?
             </h3>
             <p className="text-sm text-white/60 mb-4">
-              Con más de 4,000 refacciones en inventario, tenemos la pieza que
+              Con más de 12,000 refacciones en inventario, tenemos la pieza que
               necesitas para tu motor diesel.
             </p>
             <Link
